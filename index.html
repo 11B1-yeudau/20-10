@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>20/10 - Mai Linh</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@600;700&family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Quicksand', sans-serif; background: #fbcfe8; overflow: hidden; user-select: none; margin: 0; }
+        .font-hand { font-family: 'Dancing Script', cursive; }
+        .font-paci { font-family: 'Pacifico', cursive; }
+        .cloud { position: absolute; background: rgba(255,255,255,0.85); border-radius: 50px; filter: blur(2px); animation: fCloud 18s linear infinite; }
+        @keyframes fCloud { 0% { transform: translateX(-150px); } 100% { transform: translateX(100vw); } }
+        .f-heart { position: absolute; pointer-events: none; animation: fUp 8s linear infinite; }
+        @keyframes fUp { 0% { transform: translateY(0) scale(0.8) rotate(0deg); opacity: 0.8; } 100% { transform: translateY(-100vh) scale(1.2) rotate(360deg); opacity: 0; } }
+        .cupid { animation: fCupid 4s ease-in-out infinite; }
+        @keyframes fCupid { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-15px) rotate(2deg); } }
+        .card-inner { transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; }
+        .card-inner.flipped { transform: rotateY(180deg); }
+        .card-front, .card-back { backface-visibility: hidden; position: absolute; inset: 0; }
+        .card-back { transform: rotateY(180deg); }
+        .glow { text-shadow: 0 0 10px rgba(244,63,94,0.8), 0 0 20px rgba(244,63,94,0.6); }
+        
+        /* Cấu hình 3D Carousel xoay tròn tự động */
+        .carousel-cont { perspective: 1000px; width: 280px; height: 180px; position: relative; margin: 0 auto; }
+        .carousel-spin { width: 100%; height: 100%; position: absolute; transform-style: preserve-3d; animation: spinCarousel 15s infinite linear; }
+        @keyframes spinCarousel { 
+            from { transform: rotateY(0deg); } 
+            to { transform: rotateY(360deg); } 
+        }
+        .c-card { position: absolute; width: 150px; height: 100px; left: 65px; top: 40px; border-radius: 12px; border: 3px solid rgba(255,255,255,0.9); box-shadow: 0 0 15px rgba(255,105,180,0.6); overflow: hidden; background: #000; }
+        
+        #heartCanvas { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+        .wish-tag { position: absolute; color: #ff70a6; font-weight: 700; font-size: 1.1rem; white-space: nowrap; text-shadow: 0 0 8px rgba(255,112,166,0.9); opacity: 0; transform: scale(0.5); animation: wAppear 0.8s forwards ease-out, fWish 6s infinite alternate ease-in-out; pointer-events: none; }
+        @keyframes wAppear { to { opacity: 1; transform: scale(1); } }
+        @keyframes fWish { 0% { transform: translateY(0) scale(1); } 100% { transform: translateY(-10px) scale(1.05); } }
+        .typing::after { content: '|'; animation: blink 0.7s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-2 sm:p-4 overflow-hidden">
+
+    <!-- Thẻ phát nhạc nhac.mp4 ẩn -->
+    <audio id="bgMusic" src="nhac.mp4" loop preload="auto"></audio>
+    <button onclick="toggleMusic()" class="fixed top-4 right-4 z-50 w-10 h-10 bg-white/85 hover:bg-white text-rose-500 rounded-full shadow-lg flex items-center justify-center border-2 border-pink-300 transition-all">
+        <i id="musicIcon" class="fa-solid fa-music animate-spin" style="animation-duration: 4s;"></i>
+    </button>
+
+    <div class="relative w-full max-w-4xl h-[90vh] max-h-[700px] bg-gradient-to-b from-pink-200 via-rose-100 to-pink-300 rounded-3xl shadow-2xl border-4 border-white/80 overflow-hidden flex flex-col justify-between transition-all duration-1000">
+
+        <!-- STAGE 1: MÀN HÌNH BÓ HOA HỒNG SẮC NÉT -->
+        <div id="stage1" class="absolute inset-0 z-20 flex flex-col items-center justify-center transition-opacity duration-1000 p-6">
+            <div class="cloud top-10 w-32 h-10 left-10"></div>
+            <div class="cloud top-20 w-48 h-12 right-12" style="animation-delay: -5s;"></div>
+            <div class="absolute top-6 left-6 text-pink-400 text-4xl cupid">👼</div>
+            <div class="absolute top-6 right-6 text-pink-400 text-4xl cupid" style="animation-delay: -2s;">👼</div>
+
+            <div class="relative group cursor-pointer my-auto flex flex-col items-center" onclick="openGift()">
+                <div class="absolute -inset-4 bg-pink-400/30 rounded-full blur-xl group-hover:bg-pink-500/50 transition duration-500 animate-pulse"></div>
+                
+                <div class="relative bg-white/40 p-5 rounded-full backdrop-blur-sm border-2 border-white shadow-xl hover:scale-105 transition-transform duration-300">
+                    <svg class="w-36 h-36 sm:w-44 sm:h-44 drop-shadow-lg" viewBox="0 0 140 140">
+                        <defs>
+                            <radialGradient id="roseGrad" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" stop-color="#fff1f2"/>
+                                <stop offset="40%" stop-color="#fb7185"/>
+                                <stop offset="100%" stop-color="#e11d48"/>
+                            </radialGradient>
+                            <radialGradient id="roseDarkGrad" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" stop-color="#f43f5e"/>
+                                <stop offset="70%" stop-color="#be123c"/>
+                                <stop offset="100%" stop-color="#881337"/>
+                            </radialGradient>
+                        </defs>
+                        <path d="M25 48 Q10 32 30 25 Q40 38 25 48 Z" fill="#15803d"/>
+                        <path d="M115 48 Q130 32 110 25 Q100 38 115 48 Z" fill="#15803d"/>
+                        <path d="M35 25 Q20 10 42 12 Q45 22 35 25 Z" fill="#16a34a"/>
+                        <path d="M105 25 Q120 10 98 12 Q95 22 105 25 Z" fill="#16a34a"/>
+                        <path d="M50 12 Q60 2 70 15 Q60 20 50 12 Z" fill="#22c55e"/>
+                        <path d="M90 12 Q80 2 70 15 Q80 20 90 12 Z" fill="#22c55e"/>
+                        <path d="M25 50 Q70 18 115 50 L90 115 Q70 122 50 115 Z" fill="#fde2e4"/>
+                        <path d="M32 54 Q70 26 108 54 L85 108 Q70 114 55 108 Z" fill="#ffccd5"/>
+                        <circle cx="50" cy="36" r="14" fill="url(#roseDarkGrad)"/>
+                        <circle cx="70" cy="30" r="15" fill="url(#roseGrad)"/>
+                        <circle cx="90" cy="36" r="14" fill="url(#roseDarkGrad)"/>
+                        <circle cx="38" cy="48" r="14" fill="url(#roseGrad)"/>
+                        <circle cx="58" cy="44" r="16" fill="url(#roseGrad)"/>
+                        <circle cx="82" cy="44" r="16" fill="url(#roseGrad)"/>
+                        <circle cx="102" cy="48" r="14" fill="url(#roseGrad)"/>
+                        <circle cx="48" cy="58" r="15" fill="url(#roseDarkGrad)"/>
+                        <circle cx="70" cy="54" r="17.5" fill="url(#roseGrad)"/>
+                        <circle cx="92" cy="58" r="15" fill="url(#roseDarkGrad)"/>
+                        <path d="M70 45 C65 45 64 52 70 53 C76 53 76 47 72 46" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M58 37 C54 37 54 43 58 43 C62 43 62 39 59 39" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+                        <path d="M82 37 C78 37 78 43 82 43 C86 43 86 39 83 39" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+                        <path d="M48 50 C44 50 44 55 48 56 C52 56 52 52 49 52" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+                        <path d="M92 50 C88 50 88 55 92 56 C96 56 96 52 93 52" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+                        <path d="M22 46 C15 62 38 82 52 90 L70 125 L88 90 C102 82 125 62 118 46 C105 56 90 64 70 64 C50 64 35 56 22 46 Z" fill="#fbc4ab" opacity="0.95"/>
+                        <path d="M35 55 Q70 70 105 55 L88 105 Q70 115 52 105 Z" fill="#ffb5a7" opacity="0.6"/>
+                        <path d="M50 85 C30 75 25 98 52 92 Z" fill="#ef4444"/>
+                        <path d="M90 85 C110 75 115 98 88 92 Z" fill="#ef4444"/>
+                        <circle cx="70" cy="88" r="7" fill="#dc2626"/>
+                        <path d="M66 93 Q50 112 40 132 Q52 126 66 98 Z" fill="#ef4444"/>
+                        <path d="M74 93 Q90 112 100 132 Q88 126 74 98 Z" fill="#ef4444"/>
+                    </svg>
+                </div>
+
+                <button class="mt-8 px-8 py-3 bg-gradient-to-r from-rose-400 to-pink-500 text-white font-bold text-lg rounded-full shadow-lg hover:scale-110 active:scale-95 transition-all border-2 border-white flex items-center gap-2">
+                    <span>MỞ QUÀ</span> <i class="fa-solid fa-heart animate-bounce text-pink-200"></i>
+                </button>
+            </div>
+            <p class="text-rose-500 font-semibold mb-4 text-sm tracking-widest uppercase animate-pulse">Gửi tặng cho Mai Linh đáng yêu nhất ❤️</p>
+        </div>
+
+        <!-- STAGE 2: THIỆP CHÚC MAI LINH -->
+        <div id="stage2" class="absolute inset-0 z-10 opacity-0 pointer-events-none flex flex-col items-center justify-between p-4 sm:p-6 transition-opacity duration-1000">
+            <div class="absolute top-4 left-4 text-pink-400 text-3xl cupid">👼</div>
+            <div class="absolute top-4 right-4 text-pink-400 text-3xl cupid" style="animation-delay: -2s;">👼</div>
+
+            <div class="text-center mt-2 z-10">
+                <h1 class="text-2xl sm:text-4xl font-extrabold text-rose-600 font-paci glow">Happy Vietnamese Women's Day 20/10</h1>
+                <h2 class="text-xl sm:text-3xl font-bold text-pink-600 font-hand mt-1">Mai Linh <span class="text-rose-500">❤️</span></h2>
+            </div>
+
+            <div class="my-auto perspective-1000 w-full max-w-sm h-[320px] sm:h-[350px] cursor-pointer" onclick="nextCard()">
+                <div id="cardInner" class="card-inner relative w-full h-full rounded-2xl shadow-2xl border-4 border-white bg-white/90 p-3">
+                    <div class="card-front p-3 flex flex-col items-center justify-between">
+                        <div class="w-full h-44 sm:h-52 rounded-xl overflow-hidden bg-rose-50 border border-pink-200 flex-shrink-0">
+                            <img id="cardImgFront" src="anh1.jpg" class="w-full h-full object-cover">
+                        </div>
+                        <div class="w-full h-20 sm:h-24 flex items-center justify-center p-2 text-center overflow-y-auto">
+                            <p id="cardCaptionFront" class="text-rose-600 font-bold font-hand text-base sm:text-lg leading-snug"></p>
+                        </div>
+                    </div>
+                    <div class="card-back p-3 flex flex-col items-center justify-between">
+                        <div class="w-full h-44 sm:h-52 rounded-xl overflow-hidden bg-rose-50 border border-pink-200 flex-shrink-0">
+                            <img id="cardImgBack" src="anh2.jpg" class="w-full h-full object-cover">
+                        </div>
+                        <div class="w-full h-20 sm:h-24 flex items-center justify-center p-2 text-center overflow-y-auto">
+                            <p id="cardCaptionBack" class="text-rose-600 font-bold font-hand text-base sm:text-lg leading-snug"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mb-2 z-10">
+                <p id="subCaption" class="text-rose-600 italic font-semibold text-xs sm:text-sm bg-white/60 px-4 py-1.5 rounded-full border border-pink-200 shadow-sm min-h-[32px] flex items-center justify-center">Cảm ơn em vì đã luôn ở bên anh ✨</p>
+            </div>
+        </div>
+
+        <!-- STAGE 3: PHÁO HOA TRÁI TIM 3D & CAROUSEL XOAY TRÒN LIÊN TỤC -->
+        <div id="stage3" class="absolute inset-0 z-0 opacity-0 pointer-events-none bg-black transition-opacity duration-1000 flex flex-col items-center justify-center overflow-hidden">
+            <canvas id="heartCanvas"></canvas>
+            <div id="nightLoader" class="absolute inset-0 bg-black z-30 flex flex-col items-center justify-center transition-opacity duration-700">
+                <div class="w-12 h-12 border-4 border-pink-500 border-t-transparent rounded-full animate-spin"></div>
+                <span class="text-pink-400 font-bold mt-4 tracking-widest text-sm">Loading...</span>
+            </div>
+            <div id="floatingWishes" class="absolute inset-0 pointer-events-none z-10"></div>
+            
+            <div class="absolute bottom-12 z-20 w-full flex justify-center">
+                <div class="carousel-cont">
+                    <div class="carousel-spin" id="carouselSpinner"></div>
+                </div>
+            </div>
+
+            <div class="absolute bottom-2 z-20 text-center w-full px-4">
+                <p class="text-pink-300 font-hand text-lg sm:text-xl drop-shadow-[0_0_10px_rgba(255,105,180,0.8)]">"Vẫn gần em thôi, dù xa cách khung trời..."</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const albumData = [
+            { img: "anh1.jpg", caption: "Lần đầu gặp em, anh chưa nghĩ rằng em lại trở nên quan trọng với anh đến thế...", sub: "Kỷ niệm ngày đầu tiên ✨" },
+            { img: "anh2.jpg", caption: "Nhưng qua từng câu chuyện, nụ cười của em đã làm anh xao xuyến lúc nào không hay 💕", sub: "Đồ dễ thương của anh 🌸" },
+            { img: "anh3.jpg", caption: "Cảm ơn em vì đã đến và làm cho mỗi ngày của anh đều ngập tràn hạnh phúc!", sub: "Yêu em nhiều lắm ❤️" },
+            { img: "anh4.jpg", caption: "Chúc Mai Linh của anh ngày 20/10 thật nhiều niềm vui, xinh đẹp và mãi luôn rạng rỡ nhé! 🥰", sub: "Mãi bên nhau nhé ebe ✨" }
+        ];
+        const carouselImgs = ["anh1.jpg", "anh2.jpg", "anh3.jpg", "anh4.jpg", "anh5.jpg", "anh6.jpg"];
+        const wishList = ["20/10 vui vẻ 🌹", "Luôn hạnh phúc nhé 💖", "Yêu Mai Linh 💕", "Mãi bên nhau nhé ✨", "Xinh đẹp & Rạng rỡ 🌸", "Đã có anh ở đây rồi 💑", "Thật nhiều may mắn 🌟", "Nụ cười của em là đẹp nhất 🥰"];
+
+        let currIdx = 0, isFlipped = false, tTimer = null;
+        const bgMusic = document.getElementById('bgMusic'), musicIcon = document.getElementById('musicIcon');
+        let isPlaying = false;
+
+        function playAudio() {
+            bgMusic.play().then(() => {
+                isPlaying = true;
+                musicIcon.className = "fa-solid fa-music animate-spin";
+            }).catch(e => console.log(e));
+        }
+        function toggleMusic() {
+            if (isPlaying) { bgMusic.pause(); isPlaying = false; musicIcon.className = "fa-solid fa-music-slash"; }
+            else { playAudio(); }
+        }
+
+        function typeWriter(el, text, cb) {
+            if (tTimer) clearInterval(tTimer);
+            el.innerText = ''; el.classList.add('typing');
+            let i = 0;
+            tTimer = setInterval(() => {
+                if (i < text.length) { el.innerText += text.charAt(i++); }
+                else { clearInterval(tTimer); el.classList.remove('typing'); if (cb) cb(); }
+            }, 40);
+        }
+
+        for (let i = 0; i < 20; i++) {
+            const h = document.createElement('div');
+            h.className = 'f-heart font-hand'; h.innerHTML = '❤️';
+            h.style.cssText = `left:${Math.random()*100}vw;top:${Math.random()*100}vh;font-size:${Math.random()*18+12}px;animation-duration:${Math.random()*6+6}s;animation-delay:${Math.random()*5}s;opacity:${Math.random()*0.7+0.3}`;
+            document.body.appendChild(h);
+        }
+
+        function openGift() {
+            playAudio();
+            const s1 = document.getElementById('stage1'), s2 = document.getElementById('stage2');
+            s1.style.opacity = '0';
+            setTimeout(() => {
+                s1.style.display = 'none';
+                s2.classList.remove('pointer-events-none');
+                s2.style.opacity = '1';
+                document.getElementById('cardImgFront').src = albumData[0].img;
+                typeWriter(document.getElementById('cardCaptionFront'), albumData[0].caption);
+                document.getElementById('subCaption').innerText = albumData[0].sub;
+            }, 1000);
+        }
+
+        function nextCard() {
+            currIdx++;
+            if (currIdx >= albumData.length) { transitionToStage3(); return; }
+            const data = albumData[currIdx], cardInner = document.getElementById('cardInner');
+            isFlipped = !isFlipped;
+            if (isFlipped) {
+                document.getElementById('cardImgBack').src = data.img;
+                cardInner.classList.add('flipped');
+                setTimeout(() => typeWriter(document.getElementById('cardCaptionBack'), data.caption), 400);
+            } else {
+                document.getElementById('cardImgFront').src = data.img;
+                cardInner.classList.remove('flipped');
+                setTimeout(() => typeWriter(document.getElementById('cardCaptionFront'), data.caption), 400);
+            }
+            document.getElementById('subCaption').innerText = data.sub;
+        }
+
+        function transitionToStage3() {
+            const s2 = document.getElementById('stage2'), s3 = document.getElementById('stage3'), loader = document.getElementById('nightLoader');
+            s2.style.opacity = '0';
+            setTimeout(() => {
+                s2.style.display = 'none';
+                s3.classList.remove('pointer-events-none');
+                s3.style.opacity = '1';
+                initHeartCanvas();
+                buildCarousel();
+                spawnWishes();
+                setTimeout(() => { loader.style.opacity = '0'; setTimeout(() => loader.style.display = 'none', 700); }, 1200);
+            }, 1000);
+        }
+
+        function buildCarousel() {
+            const spinner = document.getElementById('carouselSpinner');
+            spinner.innerHTML = '';
+            const angle = 360 / carouselImgs.length;
+            carouselImgs.forEach((url, i) => {
+                const card = document.createElement('div');
+                card.className = 'c-card';
+                card.style.transform = `rotateY(${i * angle}deg) translateZ(175px)`;
+                card.innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
+                spinner.appendChild(card);
+            });
+        }
+
+        function spawnWishes() {
+            const container = document.getElementById('floatingWishes');
+            const pos = [
+                { top: '15%', left: '8%' }, { top: '20%', right: '8%' },
+                { top: '38%', left: '5%' }, { top: '42%', right: '6%' },
+                { top: '58%', left: '10%' }, { top: '62%', right: '12%' },
+                { top: '28%', left: '20%' }, { top: '32%', right: '22%' }
+            ];
+            wishList.forEach((txt, i) => {
+                const w = document.createElement('div');
+                w.className = 'wish-tag font-hand'; w.innerText = txt;
+                w.style.top = pos[i%pos.length].top;
+                if (pos[i%pos.length].left) w.style.left = pos[i%pos.length].left;
+                if (pos[i%pos.length].right) w.style.right = pos[i%pos.length].right;
+                w.style.animationDelay = `${i * 0.5}s, ${i * 0.5}s`;
+                container.appendChild(w);
+            });
+        }
+
+        function initHeartCanvas() {
+            const canvas = document.getElementById('heartCanvas'), ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth; canvas.height = canvas.parentElement.clientHeight;
+            const pts = [];
+            for (let i = 0; i < 400; i++) {
+                const t = Math.random() * Math.PI * 2;
+                const x = 16 * Math.pow(Math.sin(t), 3);
+                const y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
+                const scale = Math.min(canvas.width, canvas.height) / 45;
+                pts.push({
+                    baseX: x * scale, baseY: y * scale, x: x * scale, y: y * scale,
+                    size: Math.random() * 2.5 + 1, color: `hsl(${Math.random() * 30 + 330}, 100%, ${Math.random() * 30 + 60}%)`,
+                    alpha: Math.random() * 0.8 + 0.2, sX: (Math.random() - 0.5) * 0.8, sY: (Math.random() - 0.5) * 0.8
+                });
+            }
+            let angle = 0;
+            function render() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const cx = canvas.width / 2, cy = canvas.height / 2 - 50;
+                angle += 0.02; const zoom = 1 + Math.sin(angle) * 0.05;
+                pts.forEach(p => {
+                    p.x += p.sX; p.y += p.sY;
+                    p.x += (p.baseX * zoom - p.x) * 0.05;
+                    p.y += (p.baseY * zoom - p.y) * 0.05;
+                    ctx.save(); ctx.globalAlpha = p.alpha; ctx.shadowBlur = 10; ctx.shadowColor = p.color;
+                    ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(cx + p.x, cy + p.y, p.size, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+                });
+                requestAnimationFrame(render);
+            }
+            render();
+        }
+    </script>
+</body>
+</html>
